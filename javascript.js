@@ -19,3 +19,26 @@
 // look and feel and overall user experience. Please produce a polished result
 // ready to be released to users.
 
+  $(function() {
+    var feedUrl = 'http://feeds.feedburner.com/tedtalks_video';
+
+
+    // load feeds api
+    google.load("feeds", "1");
+
+
+
+    var init = function() {
+      console.log('hello');
+      var feed = new google.feeds.Feed(feedUrl);
+      
+      console.log('1')
+      feed.load(function(result) {
+        console.log('result is', result);
+      })
+      console.log('yo');    
+    }
+    google.setOnLoadCallback(init);
+
+    // console.log('my feed is ')
+  })
