@@ -19,26 +19,69 @@
 // look and feel and overall user experience. Please produce a polished result
 // ready to be released to users.
 
+var Entry = function(feed) {
+  // console.log('creating feed entry', feed)
+  // debugger;
+  this.class = 'feedEntry';
+  this.title = feed.title;
+  this.link = feed.link;
+  this.date = feed.publishedDate;
+  this.author = feed.author;
+  this.categories = feed.catagories;
+  this.content = feed.content;
+  this.contentSnippet = feed.contentSnippet;
+  this.mediaGroups = feed.mediaGroups;
+  console.log('this is', feed);
+  this.createEntry = function() {
+    var $entry = $('<li>', {
+      class: this.class,
+    })
+    var $title = $('<div>', {
+      class: 'title',
+      text: this.title
+    }).appendTo($entry);
+    return  $entry;
+  }
+  return this;
+}
+
   $(function() {
     var feedUrl = 'http://feeds.feedburner.com/tedtalks_video';
 
 
     // load feeds api
-    google.load("feeds", "1");
+    // callback function prevents google.load from wiping page clean
+    google.load("feeds", "1", {
+      callback: function() {}
+    });
 
 
-
+    // should create a list for the feed
     var init = function() {
-      console.log('hello');
+      console.log('initiating new feed');
       var feed = new google.feeds.Feed(feedUrl);
-      
-      console.log('1')
+
       feed.load(function(result) {
         console.log('result is', result);
-      })
-      console.log('yo');    
-    }
-    google.setOnLoadCallback(init);
+        if (!result.error) {
+          console.log('all systems go!');
+          var $list = $('<ul>', {
 
-    // console.log('my feed is ')
+          })
+
+          for (var i = 0; i < result.feed.entries.length; i++) {
+            var $newEntry = new Entry(result.feed.entries[i]);
+            $list.append($newEntry.createEntry());
+          }
+          console.log('appending to body');
+          $('body').append($list);
+        }
+        if (result.error) {
+          console.log('oh no! We have an error!');
+        }
+      })    
+    }
+    // doesn't work every time when I refresh my page...
+    // console gives this error: Uncaught TypeError: google.feeds.Feed is not a function
+    google.setOnLoadCallback(init);
   })
