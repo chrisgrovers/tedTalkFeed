@@ -61,8 +61,8 @@ var Entry = function(feed) {
 }
 
 $(function() {
-  // cross domain unblocked by using cors.io
-  var feedUrl = 'http://cors.io/?u=https://agile-thicket-5774.herokuapp.com/feed';
+  // cross domain unblocked by using cors.io http://cors.io/?u=
+  var feedUrl = 'https://agile-thicket-5774.herokuapp.com/feed';
   var numFeed = 0;
 
 
