@@ -20,68 +20,97 @@
 // ready to be released to users.
 
 var Entry = function(feed) {
-  // console.log('creating feed entry', feed)
-  // debugger;
+  console.dir(feed);
+
   this.class = 'feedEntry';
   this.title = feed.title;
   this.link = feed.link;
-  this.date = feed.publishedDate;
+  this.date = feed.pubDate;
   this.author = feed.author;
-  this.categories = feed.catagories;
-  this.content = feed.content;
+  this.categories = feed.catagory;
+  this.content = feed.description;
   this.contentSnippet = feed.contentSnippet;
   this.mediaGroups = feed.mediaGroups;
-  console.log('this is', feed);
+
   this.createEntry = function() {
     var $entry = $('<li>', {
       class: this.class,
     })
-    var $title = $('<div>', {
+    $('<h1>', {
       class: 'title',
       text: this.title
     }).appendTo($entry);
+    $('<div>', {
+      class: 'date',
+      html: 'Posted on <time>' + this.date + '</time>' 
+    }).appendTo($entry);
+    $('<div>', {
+      class: 'snippet',
+      text: this.contentSnippet
+    }).appendTo($entry);
+    $('<div>', {
+      class: 'content hidden',
+      text: this.content
+    }).appendTo($entry);
+
+
     return  $entry;
   }
+
   return this;
 }
 
-  $(function() {
-    var feedUrl = 'http://feeds.feedburner.com/tedtalks_video';
+$(function() {
+  // cross domain unblocked by using cors.io
+  var feedUrl = 'http://cors.io/?u=https://agile-thicket-5774.herokuapp.com/feed';
+  var numFeed = 0;
 
 
-    // load feeds api
-    // callback function prevents google.load from wiping page clean
-    google.load("feeds", "1", {
-      callback: function() {}
-    });
+  // load feeds api
+  // callback function prevents google.load from wiping page clean
+
+  // should create a list for the feed
+  var init = function(data) {
+    console.log('initiating new feed', data.items);
+
+    // load 10 entries instead of default 4
+    // TODO: autoload entries on scroll
 
 
-    // should create a list for the feed
-    var init = function() {
-      console.log('initiating new feed');
-      var feed = new google.feeds.Feed(feedUrl);
+      console.log('all systems go!');
 
-      feed.load(function(result) {
-        console.log('result is', result);
-        if (!result.error) {
-          console.log('all systems go!');
-          var $list = $('<ul>', {
-
-          })
-
-          for (var i = 0; i < result.feed.entries.length; i++) {
-            var $newEntry = new Entry(result.feed.entries[i]);
-            $list.append($newEntry.createEntry());
-          }
-          console.log('appending to body');
-          $('body').append($list);
+      var $list = $('<ul>', {
+        class: 'feedList',
+        // TODO: onclick display 'detail view' with more info
+        click: function(e) {
+          // console.log("i've been clicked!", e.target)
+          // if (e.target.parent('.feedEntry') !== false) {
+          // console.log('entry is', e.target.parent('.feedEntry'))
+          var parent = $(e.target).parent('.feedEntry');
+          parent.children('.snippet').toggleClass('hidden');
+          parent.children('.content').toggleClass('hidden');
         }
-        if (result.error) {
-          console.log('oh no! We have an error!');
-        }
-      })    
+      })
+
+      for (var i = 0; i < data.items.length; i++) {
+        var $newEntry = new Entry(data.items[i]);
+        $list.append($newEntry.createEntry());
+      }
+      console.log('appending to body');
+      $('body').append($list);
     }
-    // doesn't work every time when I refresh my page...
-    // console gives this error: Uncaught TypeError: google.feeds.Feed is not a function
-    google.setOnLoadCallback(init);
+
+  $.ajax({
+    url: feedUrl,
+    type: 'get',
+    dataType: 'json',
+    success: init,
+    error: function() {
+      console.log('Oh no! Error!');
+    },
+    complete: function() {
+      console.log('done');
+    }
   })
+
+})
