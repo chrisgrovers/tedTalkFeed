@@ -19,92 +19,171 @@
 // look and feel and overall user experience. Please produce a polished result
 // ready to be released to users.
 
-var Entry = function(feed) {
-  console.dir(feed);
+// TODO: should be an object that that has attributes with a loadMore function, a numLoaded var, a getDom function
+
+function Entry(feed) {
+  // console.log('creating entry')
 
   this.class = 'feedEntry';
   this.title = feed.title;
   this.link = feed.link;
   this.date = feed.pubDate;
   this.author = feed.author;
-  this.categories = feed.catagory;
-  this.content = feed.description;
+  this.category = feed.category;
+  this.content = feed['itunes:summary'];
   this.contentSnippet = feed.contentSnippet;
   this.mediaGroups = feed.mediaGroups;
+  this.thumbnail = feed['media:thumbnail'];
 
-  this.createEntry = function() {
-    var $entry = $('<li>', {
-      class: this.class,
-    })
-    $('<h1>', {
-      class: 'title',
-      text: this.title
-    }).appendTo($entry);
-    $('<div>', {
-      class: 'date',
-      html: 'Posted on <time>' + this.date + '</time>' 
-    }).appendTo($entry);
-    $('<div>', {
-      class: 'snippet',
-      text: this.contentSnippet
-    }).appendTo($entry);
-    $('<div>', {
-      class: 'content hidden',
-      text: this.content
-    }).appendTo($entry);
-
-
-    return  $entry;
-  }
-
-  return this;
 }
 
-$(function() {
-  // cross domain unblocked by using cors.io http://cors.io/?u=
-  var feedUrl = 'https://agile-thicket-5774.herokuapp.com/feed';
-  var numFeed = 0;
+Entry.prototype.createEntry = function() {
+  var $entryContainer = $('<li>', {
+    class: this.class + ' row-fluid',
+  })
+
+  var $entry = $('<li>', {
+    class: this.class + ' span6',
+  }).appendTo($entryContainer);
+
+  var $title = $('<h1>', {
+    class: 'title span12',
+    text: this.title
+  }).appendTo($entry);
+
+  var $details = $('<div>', {
+    class: 'details row-fluid',
+  }).appendTo($entry)
+
+  var $thumbnail = $('<img>', {
+    class: 'span5',
+    src: this.thumbnail['@url']
+  }).appendTo($details);
+
+  var $category = $('<div>', {
+    class: 'category span7',
+    text: 'Category: ' + this.category
+  }).appendTo($details);
+
+  var $date = $('<div>', {
+    class: 'date span7',
+    html: 'Posted on <time>' + this.date + '</time>' 
+  }).appendTo($details);
+
+  var $snippet = $('<div>', {
+    class: 'snippet span7',
+    text: this.contentSnippet
+  }).appendTo($details);
+
+  var $content = $('<div>', {
+    class: 'content hidden span12',
+    html: this.content
+  }).appendTo($details);
+
+  var $link = $('<a>', {
+    class: 'link',
+    text: 'Watch Now',
+    href: this.link
+  }).prependTo($content)
 
 
-  // load feeds api
-  // callback function prevents google.load from wiping page clean
+  return  $entry;
+}
 
-  // should create a list for the feed
-  var init = function(data) {
-    console.log('initiating new feed', data.items);
+function FeedObj(data) {
 
-    // load 10 entries instead of default 4
-    // TODO: autoload entries on scroll
+  this.end = false;
+  this.data = data;
+  this.numFeeds = 0;
+  console.log('creating feedObj', this, data.items);
+
+}
 
 
-      console.log('all systems go!');
+// should create a list for the feed to be appended to body
+FeedObj.prototype.addList = function() {
 
-      var $list = $('<ul>', {
-        class: 'feedList',
-        // TODO: onclick display 'detail view' with more info
-        click: function(e) {
-          // console.log("i've been clicked!", e.target)
-          // if (e.target.parent('.feedEntry') !== false) {
-          // console.log('entry is', e.target.parent('.feedEntry'))
-          var parent = $(e.target).parent('.feedEntry');
-          parent.children('.snippet').toggleClass('hidden');
-          parent.children('.content').toggleClass('hidden');
-        }
+  if (this.numFeeds > this.data.items.length) {
+    if (!this.end) {
+      this.end = true;
+      return $('<div>', {
+        class: 'theEnd span12',
+        text: 'End'
       })
-
-      for (var i = 0; i < data.items.length; i++) {
-        var $newEntry = new Entry(data.items[i]);
-        $list.append($newEntry.createEntry());
-      }
-      console.log('appending to body');
-      $('body').append($list);
     }
+  } else {
+    var $listContainer = $('<div>', {
+      class: 'listContainer container-fluid'
+    })
+    console.log('running addList');
+    var $list = $('<ul>', {
+      class: 'feedList span12',
+      // TODO: onclick display 'detail view' with more info
+      click: function(e) {
+        console.log("i've been clicked!", e.target)
+        // if (e.target.parent('.feedEntry') !== false) {
+        // console.log('entry is', e.target.parent('.feedEntry'))
+        var parent = $(e.target).closest('.feedEntry');
+        console.log('parent is', parent)
+        parent.find('.snippet').toggleClass('hidden');
+        parent.find('.content').toggleClass('hidden');
+      }
+    }).appendTo($listContainer);
 
+    console.log('entering for loop', this);
+    console.log('numFeeds is', this.numFeeds);
+    for (var i = this.numFeeds; i < this.numFeeds + 10 && i <  this.data.items.length; i++) {
+      // console.log('for loop entered');
+      var $newEntry = new Entry(this.data.items[i]);
+      // console.log('new entry', $newEntry);
+      $list.append($newEntry.createEntry());
+    }
+    this.numFeeds += 10;
+    console.log('should be returning $listContainer', $listContainer)
+    return $listContainer;
+
+  }
+
+}
+
+FeedObj.prototype.init = function() {
+
+  console.log('initiating new feed. this.data:', this.data)
+  console.log('this:', this);
+  console.log('all systems go!');
+
+  var $list = this.addList();
+  console.log('appending $list to body');
+  $('body').append($list);
+  }
+
+
+$(function() {
+
+  var makeNewFeed = function(data) {
+    console.log('data length is', data.items.length)
+    console.log('function makeNewFeed thrown');
+    var newFeed = new FeedObj(data);
+    console.log('new feed made', newFeed);
+    console.log('running newFeed.init');
+    newFeed.init();
+
+  // autoload entries on scroll
+    $(window).scroll(function() {
+      if($(window).scrollTop() == $(document).height() - $(window).height()) {
+        // load more items
+        var $addToList = newFeed.addList();
+        $('body').append($addToList);
+      }
+    });
+  }
+
+  console.log('ajax call');
   $.ajax({
-    url: feedUrl,
+    url: 'https://agile-thicket-5774.herokuapp.com/feed',
     type: 'get',
     dataType: 'json',
-    success: init,
+    success: makeNewFeed,
     error: function() {
       console.log('Oh no! Error!');
     },
