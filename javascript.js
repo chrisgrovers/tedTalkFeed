@@ -22,8 +22,6 @@
 // TODO: should be an object that that has attributes with a loadMore function, a numLoaded var, a getDom function
 
 function Entry(feed) {
-  // console.log('creating entry')
-
   this.class = 'feedEntry';
   this.title = feed.title;
   this.link = feed.link;
@@ -34,7 +32,6 @@ function Entry(feed) {
   this.contentSnippet = feed.contentSnippet;
   this.mediaGroups = feed.mediaGroups;
   this.thumbnail = feed['media:thumbnail'];
-
 }
 
 Entry.prototype.createEntry = function() {
@@ -47,7 +44,7 @@ Entry.prototype.createEntry = function() {
   }).appendTo($entryContainer);
 
   var $title = $('<h1>', {
-    class: 'title span12',
+    class: 'title span8',
     text: this.title
   }).appendTo($entry);
 
@@ -56,7 +53,7 @@ Entry.prototype.createEntry = function() {
   }).appendTo($entry)
 
   var $thumbnail = $('<img>', {
-    class: 'span5',
+    class: 'span4',
     src: this.thumbnail['@url']
   }).appendTo($details);
 
@@ -86,99 +83,77 @@ Entry.prototype.createEntry = function() {
     href: this.link
   }).prependTo($content)
 
-
   return  $entry;
 }
 
 function FeedObj(data) {
-
   this.end = false;
   this.data = data;
   this.numFeeds = 0;
-  console.log('creating feedObj', this, data.items);
-
 }
 
 
 // should create a list for the feed to be appended to body
 FeedObj.prototype.addList = function() {
-
   if (this.numFeeds > this.data.items.length) {
     if (!this.end) {
+      console.log('you have reached the end!');
       this.end = true;
+
       return $('<div>', {
         class: 'theEnd span12',
         text: 'End'
       })
     }
   } else {
+    console.log('returning a list!');
+
     var $listContainer = $('<div>', {
-      class: 'listContainer container-fluid'
+      class: 'listContainer list-group container-fluid'
     })
-    console.log('running addList');
+
     var $list = $('<ul>', {
       class: 'feedList span12',
-      // TODO: onclick display 'detail view' with more info
+      //  onclick display 'detail view' with more info
       click: function(e) {
         console.log("i've been clicked!", e.target)
-        // if (e.target.parent('.feedEntry') !== false) {
-        // console.log('entry is', e.target.parent('.feedEntry'))
         var parent = $(e.target).closest('.feedEntry');
-        console.log('parent is', parent)
         parent.find('.snippet').toggleClass('hidden');
         parent.find('.content').toggleClass('hidden');
       }
     }).appendTo($listContainer);
 
-    console.log('entering for loop', this);
-    console.log('numFeeds is', this.numFeeds);
     for (var i = this.numFeeds; i < this.numFeeds + 10 && i <  this.data.items.length; i++) {
-      // console.log('for loop entered');
       var $newEntry = new Entry(this.data.items[i]);
-      // console.log('new entry', $newEntry);
       $list.append($newEntry.createEntry());
     }
+
     this.numFeeds += 10;
-    console.log('should be returning $listContainer', $listContainer)
     return $listContainer;
-
   }
-
 }
 
-FeedObj.prototype.init = function() {
-
-  console.log('initiating new feed. this.data:', this.data)
-  console.log('this:', this);
-  console.log('all systems go!');
-
+FeedObj.prototype.appendList = function() {
   var $list = this.addList();
-  console.log('appending $list to body');
   $('body').append($list);
-  }
+}
 
 
 $(function() {
 
   var makeNewFeed = function(data) {
-    console.log('data length is', data.items.length)
-    console.log('function makeNewFeed thrown');
     var newFeed = new FeedObj(data);
-    console.log('new feed made', newFeed);
-    console.log('running newFeed.init');
-    newFeed.init();
+    newFeed.appendList();
 
-  // autoload entries on scroll
+    // autoload entries on scroll
     $(window).scroll(function() {
       if($(window).scrollTop() == $(document).height() - $(window).height()) {
         // load more items
-        var $addToList = newFeed.addList();
-        $('body').append($addToList);
+        newFeed.appendList();
       }
     });
   }
 
-  console.log('ajax call');
   $.ajax({
     url: 'https://agile-thicket-5774.herokuapp.com/feed',
     type: 'get',
@@ -191,5 +166,4 @@ $(function() {
       console.log('done');
     }
   })
-
 })
