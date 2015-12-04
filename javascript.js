@@ -88,6 +88,7 @@ Entry.prototype.createEntry = function() {
 
 function FeedObj(data) {
   this.end = false;
+  this.numToLoad = 10;
   this.data = data;
   this.numFeeds = 0;
 }
@@ -123,12 +124,12 @@ FeedObj.prototype.addList = function() {
       }
     }).appendTo($listContainer);
 
-    for (var i = this.numFeeds; i < this.numFeeds + 10 && i <  this.data.items.length; i++) {
+    for (var i = this.numFeeds; i < this.numFeeds + this.numToLoad && i <  this.data.items.length; i++) {
       var $newEntry = new Entry(this.data.items[i]);
       $list.append($newEntry.createEntry());
     }
 
-    this.numFeeds += 10;
+    this.numFeeds += this.numToLoad;
     return $listContainer;
   }
 }
