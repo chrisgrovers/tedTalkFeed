@@ -12,6 +12,7 @@ img {
 
 .link {
   color: red;
+  text-decoration: none;
 }
 
 .feedContainer h1 {
@@ -20,7 +21,7 @@ img {
 
 .title {
   color: #009;
-  
+
 }
 
 .length {
