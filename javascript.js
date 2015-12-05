@@ -39,9 +39,6 @@ function Entry(feed) {
 Entry.prototype.createEntry = function() {
   var $entryContainer = $('<li>', {
     class: this.class + ' col-md-6',
-    hover: function() {
-      $(this).css('cursor', 's-resize');
-    }
   })
 
   var $entry = $('<div>', {
@@ -91,10 +88,6 @@ Entry.prototype.createEntry = function() {
 
   var $contentContainer = $('<div>', {
     class: 'content hidden',
-    hover: function() {
-      console.log(this);
-      $(this).css('cursor', 'n-resize');
-    }
   }).appendTo($details);
 
   var $length = $('<div>', {
@@ -148,6 +141,7 @@ FeedObj.prototype.addList = function() {
           var parent = $(e.target).closest('.feedEntry');
           parent.find('.snippet').toggleClass('hidden');
           parent.find('.content').toggleClass('hidden');
+          console.log('this is', this)
         }
       }
     }).appendTo($listContainer);
