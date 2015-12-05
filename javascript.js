@@ -138,6 +138,7 @@ FeedObj.prototype.addList = function() {
           console.log('link clicked, no need to show details');
         } else {
           console.log("i've been clicked!", e.target)
+          $('html,body').animate({scrollTop: $(e.target).offset().top}, 800);
           var parent = $(e.target).closest('.feedEntry');
           parent.find('.snippet').toggleClass('hidden');
           parent.find('.content').toggleClass('hidden');
