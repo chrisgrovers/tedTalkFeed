@@ -32,6 +32,7 @@ function Entry(feed) {
   this.contentSnippet = feed.contentSnippet;
   this.mediaGroups = feed.mediaGroups;
   this.thumbnail = feed['media:thumbnail'];
+  this.length = feed['itunes:duration'];
 }
 
 Entry.prototype.createEntry = function() {
@@ -83,10 +84,20 @@ Entry.prototype.createEntry = function() {
     text: this.contentSnippet
   }).appendTo($details);
 
-  var $content = $('<div>', {
+
+  var $contentContainer = $('<div>', {
     class: 'content hidden',
-    html: this.content
   }).appendTo($details);
+
+  var $length = $('<div>', {
+    class: 'length',
+    text: 'video is ' + this.length + ' long'
+  }).appendTo($contentContainer);
+
+  var $content = $('<div>', {
+    class: 'contentDetails',
+    html: this.content
+  }).appendTo($contentContainer);
 
   return  $entryContainer;
 }
@@ -145,7 +156,7 @@ FeedObj.prototype.addList = function() {
 
 FeedObj.prototype.appendList = function() {
   var $list = this.addList();
-  $('body').append($list);
+  $('.feedContainer').append($list);
 }
 
 

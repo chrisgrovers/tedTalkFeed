@@ -16,11 +16,31 @@ img {
   left: -999em;
 }
 
-.theEnd {
+.feedContainer {
+  margin: 0 auto;
+  width: 80%;
+}
+
+.feedEntry {
+  margin-top: 10px;
+  margin-bottom: 10px;  
+}
+
+.feedTitle {
+  color: #B4AAAA;
+  border-bottom: 1px solid #B4AAAA;
   text-align: center;
 }
 
 .feedList{
   margin-top: 0;
   margin-bottom: 0;
+}
+
+.theEnd {
+  text-align: center;
+}
+
+.content {
+  margin-top: 10px;
 }
