@@ -33,11 +33,15 @@ function Entry(feed) {
   this.mediaGroups = feed.mediaGroups;
   this.thumbnail = feed['media:thumbnail'];
   this.length = feed['itunes:duration'];
+  this.direction = 's-resize';
 }
 
 Entry.prototype.createEntry = function() {
   var $entryContainer = $('<li>', {
     class: this.class + ' col-md-6',
+    hover: function() {
+      $(this).css('cursor', 's-resize');
+    }
   })
 
   var $entry = $('<div>', {
@@ -55,7 +59,7 @@ Entry.prototype.createEntry = function() {
 
 
   var $details = $('<div>', {
-    class: 'details',
+    class: 'details span7',
   }).appendTo($entry)
 
   var $title = $('<h4>', {
@@ -70,7 +74,7 @@ Entry.prototype.createEntry = function() {
 
   var $date = $('<div>', {
     class: 'date',
-    html: 'Posted on <time>' + this.date + '</time>' 
+    html: 'Posted: <time>' + this.date + '</time>' 
   }).appendTo($details);
 
   var $link = $('<a>', {
@@ -80,18 +84,22 @@ Entry.prototype.createEntry = function() {
   }).appendTo($details)
 
   var $snippet = $('<div>', {
-    class: 'snippet',
+    class: 'snippet span7',
     text: this.contentSnippet
   }).appendTo($details);
 
 
   var $contentContainer = $('<div>', {
     class: 'content hidden',
+    hover: function() {
+      console.log(this);
+      $(this).css('cursor', 'n-resize');
+    }
   }).appendTo($details);
 
   var $length = $('<div>', {
     class: 'length',
-    text: 'video is ' + this.length + ' long'
+    text: 'Length: ' + this.length
   }).appendTo($contentContainer);
 
   var $content = $('<div>', {
