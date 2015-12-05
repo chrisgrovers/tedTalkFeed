@@ -36,54 +36,59 @@ function Entry(feed) {
 
 Entry.prototype.createEntry = function() {
   var $entryContainer = $('<li>', {
-    class: this.class + ' row-fluid',
+    class: this.class + ' col-md-6',
   })
 
-  var $entry = $('<li>', {
-    class: this.class + ' span6',
+  var $entry = $('<div>', {
+    class: this.class + ' span12',
   }).appendTo($entryContainer);
 
-  var $title = $('<h1>', {
-    class: 'title span8',
-    text: this.title
+  var $thumbContainer = $('<div>', {
+    class: 'span4',
   }).appendTo($entry);
 
+  var $thumbnail = $('<img>', {
+    class: 'media-object',
+    src: this.thumbnail['@url']
+  }).appendTo($thumbContainer);
+
+
   var $details = $('<div>', {
-    class: 'details row-fluid',
+    class: 'details',
   }).appendTo($entry)
 
-  var $thumbnail = $('<img>', {
-    class: 'span4',
-    src: this.thumbnail['@url']
+  var $title = $('<h4>', {
+    class: 'title media-heading',
+    text: this.title
   }).appendTo($details);
 
   var $category = $('<div>', {
-    class: 'category span7',
+    class: 'category',
     text: 'Category: ' + this.category
   }).appendTo($details);
 
   var $date = $('<div>', {
-    class: 'date span7',
+    class: 'date',
     html: 'Posted on <time>' + this.date + '</time>' 
-  }).appendTo($details);
-
-  var $snippet = $('<div>', {
-    class: 'snippet span7',
-    text: this.contentSnippet
-  }).appendTo($details);
-
-  var $content = $('<div>', {
-    class: 'content hidden span12',
-    html: this.content
   }).appendTo($details);
 
   var $link = $('<a>', {
     class: 'link',
     text: 'Watch Now',
     href: this.link
-  }).prependTo($content)
+  }).appendTo($details)
 
-  return  $entry;
+  var $snippet = $('<div>', {
+    class: 'snippet',
+    text: this.contentSnippet
+  }).appendTo($details);
+
+  var $content = $('<div>', {
+    class: 'content hidden',
+    html: this.content
+  }).appendTo($details);
+
+  return  $entryContainer;
 }
 
 function FeedObj(data) {
@@ -110,17 +115,21 @@ FeedObj.prototype.addList = function() {
     console.log('returning a list!');
 
     var $listContainer = $('<div>', {
-      class: 'listContainer list-group container-fluid'
+      class: 'listContainer container'
     })
 
     var $list = $('<ul>', {
-      class: 'feedList span12',
+      class: 'feedList row',
       //  onclick display 'detail view' with more info
       click: function(e) {
-        console.log("i've been clicked!", e.target)
-        var parent = $(e.target).closest('.feedEntry');
-        parent.find('.snippet').toggleClass('hidden');
-        parent.find('.content').toggleClass('hidden');
+        if (e.target.classList.contains('link')) {
+          console.log('link clicked, no need to show details');
+        } else {
+          console.log("i've been clicked!", e.target)
+          var parent = $(e.target).closest('.feedEntry');
+          parent.find('.snippet').toggleClass('hidden');
+          parent.find('.content').toggleClass('hidden');
+        }
       }
     }).appendTo($listContainer);
 

@@ -1,4 +1,26 @@
-.hidden {
-  display: none;
+ul {
+  list-style-type: none;
 }
 
+img {
+  width: 100%;
+}
+
+.link {
+  color: red;
+}
+
+.hidden {
+  /*display: none;*/
+  position: absolute; 
+  left: -999em;
+}
+
+.theEnd {
+  text-align: center;
+}
+
+.feedList{
+  margin-top: 0;
+  margin-bottom: 0;
+}
